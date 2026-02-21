@@ -1,18 +1,17 @@
-using System;
 namespace QuantityMeasurementApp.Core
 {
-    public class Feet
+    public class Inches
     {
-        // making fields encapsulated
+        // making field encapsulated
         private readonly double value;
 
-        // field can only be initialised in constructor
-        public Feet(double value)
+        // constructor
+        public Inches(double value)
         {
             this.value = value;
         }
 
-        // overriding equals method for edge cases comparision
+        // overriding the Equals method to handle edge cases
         public override bool Equals(object? obj)
         {
             // checking for same reference
@@ -21,14 +20,13 @@ namespace QuantityMeasurementApp.Core
                 return true;
             }
 
-
             // checking for object matches type and not null
-            if (obj == null || obj.GetType() != typeof(Feet))
+            if (obj == null || obj.GetType() != typeof(Inches))
             {
                 return false;
             }
 
-            Feet other = (Feet)obj;
+            Inches other = (Inches)obj;
 
             // comparing the actual value 
             return this.value.CompareTo(other.value) == 0;
@@ -38,8 +36,5 @@ namespace QuantityMeasurementApp.Core
         {
             return value.GetHashCode();
         }
-
     }
-
-    
 }
