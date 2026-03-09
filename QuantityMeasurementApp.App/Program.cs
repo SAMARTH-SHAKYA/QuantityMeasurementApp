@@ -1,5 +1,8 @@
-﻿using System;
-using QuantityMeasurementApp.Core;
+using System;
+using QuantityMeasurementApp.Controller;
+using QuantityMeasurementApp.Entity;
+using QuantityMeasurementApp.Repository;
+using QuantityMeasurementApp.Service;
 
 namespace QuantityMeasurementApp.App
 {
@@ -7,36 +10,50 @@ namespace QuantityMeasurementApp.App
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("--- Quantity Measurement App Demo ---\n");
+            // 1. Initialize Repository (Singleton)
+            IQuantityMeasurementRepository repository = QuantityMeasurementCacheRepository.GetInstance();
 
-            // ... [Keep existing Length, Weight, Volume demos] ...
+            // 2. Initialize Service Layer (Dependency Injection)
+            IQuantityMeasurementService service = new QuantityMeasurementService(repository);
 
-            // --- Temperature Operations ---
+            // 3. Initialize Controller Layer (Facade & Dependency Injection)
+            QuantityMeasurementController controller = new QuantityMeasurementController(service);
+
+            Console.WriteLine("--- Quantity Measurement App N-Tier Demo ---\n");
+
+            // --- Equality Demonstrations ---
+            Console.WriteLine("--- Equality Demonstrations ---");
+            QuantityDTO q1 = new QuantityDTO(1.0, "Feet", "Length");
+            QuantityDTO q2 = new QuantityDTO(12.0, "Inch", "Length");
+            controller.PerformComparison(q1, q2);
+            Console.WriteLine();
+
+            // --- Conversion Demonstrations ---
+            Console.WriteLine("--- Conversion Demonstrations ---");
+            QuantityDTO convertFirst = new QuantityDTO(1.0, "Gallon", "Volume");
+            controller.PerformConversion(convertFirst, "Litre");
+            Console.WriteLine();
+
+            // --- Addition Demonstrations ---
+            Console.WriteLine("--- Addition Demonstrations ---");
+            QuantityDTO add1 = new QuantityDTO(1.0, "Kilogram", "Weight");
+            QuantityDTO add2 = new QuantityDTO(1000.0, "Gram", "Weight");
+            controller.PerformAddition(add1, add2, "Kilogram");
+            Console.WriteLine();
+
+            // --- Temperature Operations (Expecting Error for Addition) ---
             Console.WriteLine("--- Temperature Demonstrations ---");
-            Quantity<TemperatureUnit> temp1 = new Quantity<TemperatureUnit>(100.0, TemperatureUnit.Celsius);
-            Quantity<TemperatureUnit> temp2 = new Quantity<TemperatureUnit>(212.0, TemperatureUnit.Fahrenheit);
-            DemonstrateEquality(temp1, temp2);
+            QuantityDTO temp1 = new QuantityDTO(100.0, "Celsius", "Temperature");
+            QuantityDTO temp2 = new QuantityDTO(212.0, "Fahrenheit", "Temperature");
+            controller.PerformComparison(temp1, temp2);
 
-            Quantity<TemperatureUnit> tempConverted = new Quantity<TemperatureUnit>(temp1.ConvertTo(TemperatureUnit.Kelvin), TemperatureUnit.Kelvin);
-            Console.WriteLine($"Converted: Quantity(100.0, CELSIUS).convertTo(KELVIN) -> Output: {tempConverted}");
+            controller.PerformConversion(temp1, "Kelvin");
 
             Console.WriteLine("Attempting unsupported addition (100 Celsius + 50 Celsius):");
-            try
-            {
-                Quantity<TemperatureUnit> temp3 = new Quantity<TemperatureUnit>(50.0, TemperatureUnit.Celsius);
-                temp1.Add(temp3);
-            }
-            catch (NotSupportedException ex)
-            {
-                Console.WriteLine($"Error Caught: {ex.Message}");
-            }
+            QuantityDTO temp3 = new QuantityDTO(50.0, "Celsius", "Temperature");
+            controller.PerformAddition(temp1, temp3, "Celsius");
             
             Console.WriteLine();
-        }
-
-        public static void DemonstrateEquality<T>(Quantity<T> q1, Quantity<T> q2) where T : IMeasurable
-        {
-            Console.WriteLine($"Equality: {q1} equals {q2} -> Output: {q1.Equals(q2)}");
         }
     }
 }

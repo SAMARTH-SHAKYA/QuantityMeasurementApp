@@ -1,4 +1,4 @@
-namespace QuantityMeasurementApp.Core
+namespace QuantityMeasurementApp.Entity
 {
     // Represents different length units and their conversion to base unit (Feet)
     public class LengthUnit : IMeasurable
@@ -33,6 +33,20 @@ namespace QuantityMeasurementApp.Core
         }
 
         public string GetUnitName() => name;
+
+        public string GetMeasurementType() => "Length";
+
+        public IMeasurable GetUnitInstance(string name)
+        {
+            return name.ToUpper() switch
+            {
+                "FEET" => Feet,
+                "INCH" => Inch,
+                "YARD" => Yard,
+                "CENTIMETER" => Centimeter,
+                _ => throw new ArgumentException($"Invalid Length unit: {name}")
+            };
+        }
 
         public override string ToString() => name;
     }
