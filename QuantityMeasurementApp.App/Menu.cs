@@ -6,9 +6,7 @@ using QuantityMeasurementApp.Entity;
 
 namespace QuantityMeasurementApp.App
 {
-    /// <summary>
-    /// Interactive console menu that delegates all operations to the controller.
-    /// </summary>
+
     public class Menu : IMenu
     {
         // ─── Unit reference tables ────────────────────────────────────────────
