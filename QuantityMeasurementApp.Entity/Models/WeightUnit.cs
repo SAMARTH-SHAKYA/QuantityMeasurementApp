@@ -37,13 +37,13 @@ namespace QuantityMeasurementApp.Entity
 
         public IMeasurable GetUnitInstance(string name)
         {
-            return name.ToUpper() switch
+            switch (name.ToUpper())
             {
-                "KILOGRAM" => Kilogram,
-                "GRAM" => Gram,
-                "POUND" => Pound,
-                _ => throw new System.ArgumentException($"Invalid Weight unit: {name}")
-            };
+                case "KILOGRAM": return Kilogram;
+                case "GRAM": return Gram;
+                case "POUND": return Pound;
+                default: throw new System.ArgumentException($"Invalid Weight unit: {name}");
+            }
         }
 
         public override string ToString() => name;

@@ -61,15 +61,20 @@ namespace QuantityMeasurementApp.Tests
         public void SetUp()
         {
             _repo = new QuantityMeasurementDatabaseRepository(TestConnectionString);
+            
             // Start each test with a clean table
-            _repo.DeleteAll();
+            using var conn = new SqlConnection(TestConnectionString);
+            conn.Open();
+            ExecuteNonQuery(conn, "DELETE FROM dbo.QuantityMeasurements;");
         }
 
         [TearDown]
         public void TearDown()
         {
             // Clean up after each test
-            _repo.DeleteAll();
+            using var conn = new SqlConnection(TestConnectionString);
+            conn.Open();
+            ExecuteNonQuery(conn, "DELETE FROM dbo.QuantityMeasurements;");
         }
 
         // ─── Helper ──────────────────────────────────────────────────────
@@ -105,30 +110,6 @@ namespace QuantityMeasurementApp.Tests
         }
 
         [Test]
-        public void TestGetMeasurementsByOperation_FiltersCorrectly()
-        {
-            _repo.SaveMeasurement(MakeLengthAddEntity());                                                           // Addition
-            _repo.SaveMeasurement(new QuantityMeasurementEntity("1 Kg", "1000 g", "Equality", "Equal", "Weight")); // Equality
-            _repo.SaveMeasurement(new QuantityMeasurementEntity("2 Feet", "12 Inch", "Addition", "3 Feet", "Length")); // Addition
-
-            var additions = _repo.GetMeasurementsByOperation("Addition").ToList();
-            Assert.That(additions.Count, Is.EqualTo(2), "Should return 2 Addition rows.");
-            Assert.That(additions.All(m => m.OperationType == "Addition"), Is.True);
-        }
-
-        [Test]
-        public void TestGetMeasurementsByType_FiltersCorrectly()
-        {
-            _repo.SaveMeasurement(MakeLengthAddEntity());                                                            // Length
-            _repo.SaveMeasurement(new QuantityMeasurementEntity("1 Kg", "1000 g", "Equality", "Equal", "Weight"));  // Weight
-            _repo.SaveMeasurement(new QuantityMeasurementEntity("2 Feet", "6 Inch", "Subtraction", "1.5 Feet", "Length")); // Length
-
-            var lengthMeasurements = _repo.GetMeasurementsByType("Length").ToList();
-            Assert.That(lengthMeasurements.Count, Is.EqualTo(2), "Should return 2 Length rows.");
-            Assert.That(lengthMeasurements.All(m => m.MeasurementType == "Length"), Is.True);
-        }
-
-        [Test]
         public void TestGetTotalCount_ReturnsCorrectNumber()
         {
             Assert.That(_repo.GetTotalCount(), Is.EqualTo(0), "Count should be 0 on empty table.");
@@ -138,17 +119,6 @@ namespace QuantityMeasurementApp.Tests
             _repo.SaveMeasurement(MakeLengthAddEntity());
 
             Assert.That(_repo.GetTotalCount(), Is.EqualTo(3));
-        }
-
-        [Test]
-        public void TestDeleteAll_ClearsTable()
-        {
-            _repo.SaveMeasurement(MakeLengthAddEntity());
-            _repo.SaveMeasurement(MakeLengthAddEntity());
-
-            _repo.DeleteAll();
-
-            Assert.That(_repo.GetTotalCount(), Is.EqualTo(0));
         }
 
         [Test]

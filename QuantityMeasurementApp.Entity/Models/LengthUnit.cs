@@ -38,14 +38,14 @@ namespace QuantityMeasurementApp.Entity
 
         public IMeasurable GetUnitInstance(string name)
         {
-            return name.ToUpper() switch
+            switch (name.ToUpper())
             {
-                "FEET" => Feet,
-                "INCH" => Inch,
-                "YARD" => Yard,
-                "CENTIMETER" => Centimeter,
-                _ => throw new System.ArgumentException($"Invalid Length unit: {name}")
-            };
+                case "FEET": return Feet;
+                case "INCH": return Inch;
+                case "YARD": return Yard;
+                case "CENTIMETER": return Centimeter;
+                default: throw new System.ArgumentException($"Invalid Length unit: {name}");
+            }
         }
 
         public override string ToString() => name;

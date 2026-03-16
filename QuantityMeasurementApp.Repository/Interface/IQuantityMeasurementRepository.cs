@@ -12,17 +12,8 @@ namespace QuantityMeasurementApp.Repository
         // Retrieve all stored measurements
         List<QuantityMeasurementEntity> GetAllMeasurements();
 
-        // Retrieve measurements filtered by operation type (e.g. "Addition", "Conversion")
-        List<QuantityMeasurementEntity> GetMeasurementsByOperation(string operationType);
-
-        // Retrieve measurements filtered by measurement type (e.g. "Length", "Weight")
-        List<QuantityMeasurementEntity> GetMeasurementsByType(string measurementType);
-
         // Return the total count of stored measurements
         int GetTotalCount();
-
-        // Delete all measurements (useful for testing / reset)
-        void DeleteAll();
     }
 }
 

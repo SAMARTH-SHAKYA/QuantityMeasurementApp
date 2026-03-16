@@ -50,29 +50,7 @@ namespace QuantityMeasurementApp.Repository
 
         public List<QuantityMeasurementEntity> GetAllMeasurements() => _cache.GetAllMeasurements();
 
-        public List<QuantityMeasurementEntity> GetMeasurementsByOperation(string operationType) =>
-            _cache.GetMeasurementsByOperation(operationType);
-
-        public List<QuantityMeasurementEntity> GetMeasurementsByType(string measurementType) =>
-            _cache.GetMeasurementsByType(measurementType);
-
         public int GetTotalCount() => _cache.GetTotalCount();
-
-        public void DeleteAll()
-        {
-            _cache.DeleteAll();
-            _pendingStore.OverwriteAll(new List<QuantityMeasurementEntity>());
-
-            // Optional: if DB is available, clear it too to keep both stores aligned for dev/testing.
-            try
-            {
-                _database?.DeleteAll();
-            }
-            catch
-            {
-                // If DB is offline, we still consider local delete successful.
-            }
-        }
 
         // Call this at startup (and optionally on exit) to push pending operations to the DB.
         public int SyncPendingToDatabase()

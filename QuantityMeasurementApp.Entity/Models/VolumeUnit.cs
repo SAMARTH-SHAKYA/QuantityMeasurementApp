@@ -37,13 +37,13 @@ namespace QuantityMeasurementApp.Entity
 
         public IMeasurable GetUnitInstance(string name)
         {
-            return name.ToUpper() switch
+            switch (name.ToUpper())
             {
-                "LITRE" => Litre,
-                "MILLILITRE" => Millilitre,
-                "GALLON" => Gallon,
-                _ => throw new System.ArgumentException($"Invalid Volume unit: {name}")
-            };
+                case "LITRE": return Litre;
+                case "MILLILITRE": return Millilitre;
+                case "GALLON": return Gallon;
+                default: throw new System.ArgumentException($"Invalid Volume unit: {name}");
+            }
         }
 
         public override string ToString() => name;

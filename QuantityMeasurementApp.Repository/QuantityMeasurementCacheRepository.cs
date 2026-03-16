@@ -56,52 +56,11 @@ namespace QuantityMeasurementApp.Repository
             }
         }
 
-        public List<QuantityMeasurementEntity> GetMeasurementsByOperation(string operationType)
-        {
-            lock (lockObject)
-            {
-                var results = new List<QuantityMeasurementEntity>();
-                foreach (var m in measurementCache)
-                {
-                    if (string.Equals(m.OperationType, operationType, StringComparison.OrdinalIgnoreCase))
-                    {
-                        results.Add(m);
-                    }
-                }
-                return results;
-            }
-        }
-
-        public List<QuantityMeasurementEntity> GetMeasurementsByType(string measurementType)
-        {
-            lock (lockObject)
-            {
-                var results = new List<QuantityMeasurementEntity>();
-                foreach (var m in measurementCache)
-                {
-                    if (string.Equals(m.MeasurementType, measurementType, StringComparison.OrdinalIgnoreCase))
-                    {
-                        results.Add(m);
-                    }
-                }
-                return results;
-            }
-        }
-
         public int GetTotalCount()
         {
             lock (lockObject)
             {
                 return measurementCache.Count;
-            }
-        }
-
-        public void DeleteAll()
-        {
-            lock (lockObject)
-            {
-                measurementCache.Clear();
-                SaveToDisk();
             }
         }
 
