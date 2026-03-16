@@ -25,8 +25,17 @@ namespace QuantityMeasurementApp.Repository
             try
             {
                 using var conn = OpenConnection();
-                // Connection opened and closed successfully — table assumed to exist
-                // (schema.sql must be run in SSMS first).
+                using var cmd = new SqlCommand(
+                    "SELECT OBJECT_ID(N'dbo.QuantityMeasurements', N'U')",
+                    conn);
+
+                object? obj = cmd.ExecuteScalar();
+                if (obj == null || obj == DBNull.Value)
+                {
+                    throw new DatabaseException(
+                        "Connected to SQL Server, but table dbo.QuantityMeasurements was not found. " +
+                        "Ensure you are using the correct database and have run the schema script.");
+                }
             }
             catch (DatabaseException)
             {

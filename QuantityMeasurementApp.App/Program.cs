@@ -8,9 +8,8 @@ namespace QuantityMeasurementApp.App
     {
         static void Main(string[] args)
         {
-            // Fixed startup: always try SQL Server first; if it fails, fall back to cache-only.
             const string connectionString =
-                "Data Source=.\\SQLEXPRESS;Integrated Security=True;Persist Security Info=False;Pooling=False;" +
+                "Data Source=.\\SQLEXPRESS;Database=QuantityMeasurementDB;Integrated Security=True;Persist Security Info=False;Pooling=False;" +
                 "MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;" +
                 "Application Name=\"SQL Server Management Studio\";Command Timeout=0";
 

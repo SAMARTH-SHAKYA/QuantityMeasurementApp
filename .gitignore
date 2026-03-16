@@ -15,6 +15,7 @@ TestResults/
 
 # Local cache/database files created by our application
 measurement_history.json
+measurement_pending_sync.json
 
 # Temporary logs
 *.log
