@@ -66,8 +66,14 @@ namespace QuantityMeasurementApp.Service
                 bool areEqual = baseVal1.CompareTo(baseVal2) == 0;
 
                 // Save Entity
-                var resultString = areEqual ? "Equal" : "Not Equal";
-                var entity = new QuantityMeasurementEntity(q1.ToString(), q2.ToString(), "Equality", resultString);
+                var resultString    = areEqual ? "Equal" : "Not Equal";
+                var measurementType = q1.MeasurementType;
+                var entity = new QuantityMeasurementEntity(
+                    q1.ToString(),
+                    q2.ToString(),
+                    "Equality",
+                    resultString,
+                    measurementType);
                 repository.SaveMeasurement(entity);
 
                 // Return DTO containing boolean as string in the Value/Unit hack, 
@@ -92,9 +98,16 @@ namespace QuantityMeasurementApp.Service
                 double baseVal = model.Unit.ConvertToBaseUnit(model.Value);
                 double convertedVal = Math.Round(targetUnit.ConvertFromBaseUnit(baseVal), 5);
 
-                var resultDto = new QuantityDTO(convertedVal, targetUnit.GetUnitName(), targetUnit.GetMeasurementType());
+                var resultDto = new QuantityDTO(
+                    convertedVal,
+                    targetUnit.GetUnitName(),
+                    targetUnit.GetMeasurementType());
 
-                var entity = new QuantityMeasurementEntity(source.ToString(), "Conversion", resultDto.ToString());
+                var entity = new QuantityMeasurementEntity(
+                    source.ToString(),
+                    "Conversion",
+                    resultDto.ToString(),
+                    targetUnit.GetMeasurementType());
                 repository.SaveMeasurement(entity);
 
                 return resultDto;
@@ -138,7 +151,12 @@ namespace QuantityMeasurementApp.Service
                 double result = baseVal1 / baseVal2;
                 var resultDto = new QuantityDTO(result, "Ratio", "Scalar");
 
-                var entity = new QuantityMeasurementEntity(q1.ToString(), q2.ToString(), "Division", resultDto.ToString());
+                var entity = new QuantityMeasurementEntity(
+                    q1.ToString(),
+                    q2.ToString(),
+                    "Division",
+                    resultDto.ToString(),
+                    q1.MeasurementType);
                 repository.SaveMeasurement(entity);
 
                 return resultDto;
@@ -169,15 +187,27 @@ namespace QuantityMeasurementApp.Service
                 double baseResult = compute(baseVal1, baseVal2);
                 double targetResult = Math.Round(targetUnit.ConvertFromBaseUnit(baseResult), 5);
 
-                var resultDto = new QuantityDTO(targetResult, targetUnit.GetUnitName(), targetUnit.GetMeasurementType());
+                var resultDto = new QuantityDTO(
+                    targetResult,
+                    targetUnit.GetUnitName(),
+                    targetUnit.GetMeasurementType());
 
-                var entity = new QuantityMeasurementEntity(q1.ToString(), q2.ToString(), operationName, resultDto.ToString());
+                var entity = new QuantityMeasurementEntity(
+                    q1.ToString(),
+                    q2.ToString(),
+                    operationName,
+                    resultDto.ToString(),
+                    q1.MeasurementType);
                 repository.SaveMeasurement(entity);
 
                 return resultDto;
             }
             catch (Exception ex)
             {
+                if (q1.MeasurementType.Equals("Temperature", StringComparison.OrdinalIgnoreCase))
+                {
+                    ex = new QuantityMeasurementException("Temperature does not support Addition/Subtraction operations.", ex);
+                }
                 var entity = new QuantityMeasurementEntity(q1.ToString(), q2.ToString(), operationName, ex.Message, true);
                 repository.SaveMeasurement(entity);
                 throw new QuantityMeasurementException(ex.Message, ex);

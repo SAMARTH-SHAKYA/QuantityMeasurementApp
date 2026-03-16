@@ -49,3 +49,4 @@ namespace QuantityMeasurementApp.Entity
         public override string ToString() => name;
     }
 }
+

@@ -12,3 +12,4 @@ namespace QuantityMeasurementApp.Service
         QuantityDTO Divide(QuantityDTO q1, QuantityDTO q2);
     }
 }
+

@@ -8,14 +8,41 @@ namespace QuantityMeasurementApp.App
     {
         static void Main(string[] args)
         {
+            // Fixed startup: always try SQL Server first; if it fails, fall back to cache-only.
+            const string connectionString =
+                "Data Source=.\\SQLEXPRESS;Integrated Security=True;Persist Security Info=False;Pooling=False;" +
+                "MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;" +
+                "Application Name=\"SQL Server Management Studio\";Command Timeout=0";
+
             // ── Bootstrap the N-tier stack ──────────────────────────────────
-            IQuantityMeasurementRepository repository = QuantityMeasurementCacheRepository.GetInstance();
-            IQuantityMeasurementService     service    = new QuantityMeasurementService(repository);
-            QuantityMeasurementController   controller = new QuantityMeasurementController(service);
+            IQuantityMeasurementRepository repository;
+
+            try
+            {
+                var cacheRepo = QuantityMeasurementCacheRepository.GetInstance();
+                var dbRepo = new QuantityMeasurementDatabaseRepository(connectionString);
+                var syncRepo = new QuantityMeasurementSyncRepository(cacheRepo, dbRepo);
+                syncRepo.SyncPendingToDatabase();
+
+                Console.WriteLine("[App] SQL Server available. Running in offline-first mode (cache -> sync).");
+                repository = syncRepo;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[App] SQL Server unavailable. Using cache-only mode. Reason: {ex.Message}");
+                repository = QuantityMeasurementCacheRepository.GetInstance();
+            }
+
+            IQuantityMeasurementService   service    = new QuantityMeasurementService(repository);
+            QuantityMeasurementController controller = new QuantityMeasurementController(service);
 
             // ── Hand off to the menu ────────────────────────────────────────
             IMenu menu = new Menu(controller);
             menu.Run();
+
+            // ── Print summary on exit ───────────────────────────────────────
+            int totalSaved = repository.GetTotalCount();
+            Console.WriteLine($"\n[App] Session complete. Total measurements stored: {totalSaved}");
         }
     }
 }

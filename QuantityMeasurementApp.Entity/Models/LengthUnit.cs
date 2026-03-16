@@ -44,10 +44,11 @@ namespace QuantityMeasurementApp.Entity
                 "INCH" => Inch,
                 "YARD" => Yard,
                 "CENTIMETER" => Centimeter,
-                _ => throw new ArgumentException($"Invalid Length unit: {name}")
+                _ => throw new System.ArgumentException($"Invalid Length unit: {name}")
             };
         }
 
         public override string ToString() => name;
     }
 }
+

@@ -6,18 +6,18 @@ namespace QuantityMeasurementApp.Entity
     {
         // Base Unit: Celsius
         public static readonly TemperatureUnit Celsius = new TemperatureUnit(
-            "Celsius", 
-            c => c, 
+            "Celsius",
+            c => c,
             c => c);
-            
+
         public static readonly TemperatureUnit Fahrenheit = new TemperatureUnit(
-            "Fahrenheit", 
-            f => (f - 32.0) * 5.0 / 9.0, 
+            "Fahrenheit",
+            f => (f - 32.0) * 5.0 / 9.0,
             c => (c * 9.0 / 5.0) + 32.0);
-            
+
         public static readonly TemperatureUnit Kelvin = new TemperatureUnit(
-            "Kelvin", 
-            k => k - 273.15, 
+            "Kelvin",
+            k => k - 273.15,
             c => c + 273.15);
 
         private readonly string name;
@@ -32,7 +32,7 @@ namespace QuantityMeasurementApp.Entity
         }
 
         // Dummy conversion factor since temperature uses non-linear lambda functions
-        public double GetConversionFactor() => 1.0; 
+        public double GetConversionFactor() => 1.0;
 
         public double ConvertToBaseUnit(double value) => toBase(value);
 
@@ -64,3 +64,4 @@ namespace QuantityMeasurementApp.Entity
         public override string ToString() => name;
     }
 }
+
