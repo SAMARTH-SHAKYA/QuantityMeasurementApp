@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using QuantityMeasurementApp.Entity;
 
@@ -48,7 +47,7 @@ namespace QuantityMeasurementApp.Repository
             }
         }
 
-        public IEnumerable<QuantityMeasurementEntity> GetAllMeasurements()
+        public List<QuantityMeasurementEntity> GetAllMeasurements()
         {
             lock (lockObject)
             {
@@ -57,23 +56,35 @@ namespace QuantityMeasurementApp.Repository
             }
         }
 
-        public IEnumerable<QuantityMeasurementEntity> GetMeasurementsByOperation(string operationType)
+        public List<QuantityMeasurementEntity> GetMeasurementsByOperation(string operationType)
         {
             lock (lockObject)
             {
-                return measurementCache
-                    .Where(m => string.Equals(m.OperationType, operationType, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
+                var results = new List<QuantityMeasurementEntity>();
+                foreach (var m in measurementCache)
+                {
+                    if (string.Equals(m.OperationType, operationType, StringComparison.OrdinalIgnoreCase))
+                    {
+                        results.Add(m);
+                    }
+                }
+                return results;
             }
         }
 
-        public IEnumerable<QuantityMeasurementEntity> GetMeasurementsByType(string measurementType)
+        public List<QuantityMeasurementEntity> GetMeasurementsByType(string measurementType)
         {
             lock (lockObject)
             {
-                return measurementCache
-                    .Where(m => string.Equals(m.MeasurementType, measurementType, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
+                var results = new List<QuantityMeasurementEntity>();
+                foreach (var m in measurementCache)
+                {
+                    if (string.Equals(m.MeasurementType, measurementType, StringComparison.OrdinalIgnoreCase))
+                    {
+                        results.Add(m);
+                    }
+                }
+                return results;
             }
         }
 

@@ -10,13 +10,13 @@ namespace QuantityMeasurementApp.Repository
         void SaveMeasurement(QuantityMeasurementEntity measurement);
 
         // Retrieve all stored measurements
-        IEnumerable<QuantityMeasurementEntity> GetAllMeasurements();
+        List<QuantityMeasurementEntity> GetAllMeasurements();
 
         // Retrieve measurements filtered by operation type (e.g. "Addition", "Conversion")
-        IEnumerable<QuantityMeasurementEntity> GetMeasurementsByOperation(string operationType);
+        List<QuantityMeasurementEntity> GetMeasurementsByOperation(string operationType);
 
         // Retrieve measurements filtered by measurement type (e.g. "Length", "Weight")
-        IEnumerable<QuantityMeasurementEntity> GetMeasurementsByType(string measurementType);
+        List<QuantityMeasurementEntity> GetMeasurementsByType(string measurementType);
 
         // Return the total count of stored measurements
         int GetTotalCount();

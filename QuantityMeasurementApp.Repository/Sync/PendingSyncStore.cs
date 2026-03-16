@@ -37,7 +37,7 @@ namespace QuantityMeasurementApp.Repository
             }
         }
 
-        public void OverwriteAll(IEnumerable<QuantityMeasurementEntity> entities)
+        public void OverwriteAll(List<QuantityMeasurementEntity> entities)
         {
             lock (LockObject)
             {

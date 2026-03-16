@@ -19,10 +19,6 @@ namespace QuantityMeasurementApp.Repository
         // connectionString: full SQL Server connection string, e.g. from appsettings.json.
         public QuantityMeasurementDatabaseRepository(string connectionString)
         {
-            if (string.IsNullOrWhiteSpace(connectionString))
-                throw new ArgumentNullException(nameof(connectionString),
-                    "A connection string must be provided for the database repository.");
-
             _connectionString = connectionString;
             VerifyConnection();
             Console.WriteLine("[DatabaseRepository] Connected to SQL Server.");
@@ -60,7 +56,7 @@ namespace QuantityMeasurementApp.Repository
         }
 
         /// <inheritdoc/>
-        public IEnumerable<QuantityMeasurementEntity> GetAllMeasurements()
+        public List<QuantityMeasurementEntity> GetAllMeasurements()
         {
             var results = new List<QuantityMeasurementEntity>();
 
@@ -82,7 +78,7 @@ namespace QuantityMeasurementApp.Repository
         }
 
         /// <inheritdoc/>
-        public IEnumerable<QuantityMeasurementEntity> GetMeasurementsByOperation(string operationType)
+        public List<QuantityMeasurementEntity> GetMeasurementsByOperation(string operationType)
         {
             if (string.IsNullOrWhiteSpace(operationType))
                 throw new ArgumentException("operationType must not be null or empty.", nameof(operationType));
@@ -109,7 +105,7 @@ namespace QuantityMeasurementApp.Repository
         }
 
         /// <inheritdoc/>
-        public IEnumerable<QuantityMeasurementEntity> GetMeasurementsByType(string measurementType)
+        public List<QuantityMeasurementEntity> GetMeasurementsByType(string measurementType)
         {
             if (string.IsNullOrWhiteSpace(measurementType))
                 throw new ArgumentException("measurementType must not be null or empty.", nameof(measurementType));

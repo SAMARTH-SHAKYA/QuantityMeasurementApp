@@ -10,22 +10,28 @@ namespace QuantityMeasurementApp.Service
 
         public QuantityMeasurementService(IQuantityMeasurementRepository repository)
         {
-            this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            this.repository = repository;
         }
 
         // --- Helper Methods to Retrieve Typed Models from DTO ---
         
         private IMeasurable GetUnitFromDTO(QuantityDTO dto)
         {
-            var measurementType = dto.MeasurementType.ToUpper();
-            return measurementType switch
+            string measurementType = dto.MeasurementType.ToUpper();
+
+            switch (measurementType)
             {
-                "LENGTH" => LengthUnit.Feet.GetUnitInstance(dto.Unit),
-                "VOLUME" => VolumeUnit.Litre.GetUnitInstance(dto.Unit),
-                "WEIGHT" => WeightUnit.Kilogram.GetUnitInstance(dto.Unit),
-                "TEMPERATURE" => TemperatureUnit.Celsius.GetUnitInstance(dto.Unit),
-                _ => throw new QuantityMeasurementException($"Unsupported Measurement Type: {dto.MeasurementType}")
-            };
+                case "LENGTH":
+                    return LengthUnit.Feet.GetUnitInstance(dto.Unit);
+                case "VOLUME":
+                    return VolumeUnit.Litre.GetUnitInstance(dto.Unit);
+                case "WEIGHT":
+                    return WeightUnit.Kilogram.GetUnitInstance(dto.Unit);
+                case "TEMPERATURE":
+                    return TemperatureUnit.Celsius.GetUnitInstance(dto.Unit);
+                default:
+                    throw new QuantityMeasurementException($"Unsupported Measurement Type: {dto.MeasurementType}");
+            }
         }
 
         private QuantityModel<IMeasurable> GetModelFromDTO(QuantityDTO dto)
@@ -122,12 +128,12 @@ namespace QuantityMeasurementApp.Service
 
         public QuantityDTO Add(QuantityDTO q1, QuantityDTO q2, string targetUnitName)
         {
-            return PerformArithmetic(q1, q2, targetUnitName, "Addition", (b1, b2) => b1 + b2);
+            return PerformArithmetic(q1, q2, targetUnitName, "Addition");
         }
 
         public QuantityDTO Subtract(QuantityDTO q1, QuantityDTO q2, string targetUnitName)
         {
-            return PerformArithmetic(q1, q2, targetUnitName, "Subtraction", (b1, b2) => b1 - b2);
+            return PerformArithmetic(q1, q2, targetUnitName, "Subtraction");
         }
 
         public QuantityDTO Divide(QuantityDTO q1, QuantityDTO q2)
@@ -169,7 +175,7 @@ namespace QuantityMeasurementApp.Service
             }
         }
 
-        private QuantityDTO PerformArithmetic(QuantityDTO q1, QuantityDTO q2, string targetUnitName, string operationName, Func<double, double, double> compute)
+        private QuantityDTO PerformArithmetic(QuantityDTO q1, QuantityDTO q2, string targetUnitName, string operationName)
         {
             try
             {
@@ -184,7 +190,19 @@ namespace QuantityMeasurementApp.Service
                 double baseVal1 = model1.Unit.ConvertToBaseUnit(model1.Value);
                 double baseVal2 = model2.Unit.ConvertToBaseUnit(model2.Value);
 
-                double baseResult = compute(baseVal1, baseVal2);
+                double baseResult = 0;
+                if (operationName == "Addition")
+                {
+                    baseResult = baseVal1 + baseVal2;
+                }
+                else if (operationName == "Subtraction")
+                {
+                    baseResult = baseVal1 - baseVal2;
+                }
+                else
+                {
+                    throw new QuantityMeasurementException("Unsupported Arithmetic Operation: " + operationName);
+                }
                 double targetResult = Math.Round(targetUnit.ConvertFromBaseUnit(baseResult), 5);
 
                 var resultDto = new QuantityDTO(

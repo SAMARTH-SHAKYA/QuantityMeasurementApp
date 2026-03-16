@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using QuantityMeasurementApp.Entity;
 
 namespace QuantityMeasurementApp.App
@@ -10,72 +8,56 @@ namespace QuantityMeasurementApp.App
     {
         internal static readonly Dictionary<string, string[]> Units = new Dictionary<string, string[]>
         {
-            ["Length"]      = new[] { "Feet", "Inch", "Yard", "Centimeter" },
-            ["Volume"]      = new[] { "Litre", "Millilitre", "Gallon" },
-            ["Weight"]      = new[] { "Kilogram", "Gram", "Tonne" },
-            ["Temperature"] = new[] { "Celsius", "Fahrenheit", "Kelvin" }
+            ["Length"] = new string[] { "Feet", "Inch", "Yard", "Centimeter" },
+            ["Volume"] = new string[] { "Litre", "Millilitre", "Gallon" },
+            ["Weight"] = new string[] { "Kilogram", "Gram", "Tonne" },
+            ["Temperature"] = new string[] { "Celsius", "Fahrenheit", "Kelvin" }
         };
 
-        internal static void PrintHeader()
+        internal static int PickFromMenu(string title, string[] options)
         {
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("╔══════════════════════════════════════════════╗");
-            Console.WriteLine("║      Quantity Measurement App  v1.0          ║");
-            Console.WriteLine("╚══════════════════════════════════════════════╝");
-            Console.ResetColor();
-            Console.WriteLine();
-        }
-
-        internal static int PickFromMenu(string title, params string[] options)
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"  {title}");
-            Console.ResetColor();
-            Console.WriteLine("  " + new string('─', 40));
-
-            foreach (var option in options)
+            Console.WriteLine("\n--- " + title + " ---");
+            for (int i = 0; i < options.Length; i++)
             {
-                Console.WriteLine($"  {option}");
+                Console.WriteLine((i + 1) + ". " + options[i]);
             }
 
-            Console.WriteLine();
             while (true)
             {
-                Console.Write("  Enter choice: ");
-                if (int.TryParse(Console.ReadLine()?.Trim(), out int choice)
-                    && choice >= 1 && choice <= options.Length)
+                Console.Write("Enter choice: ");
+                string input = Console.ReadLine();
+                try
                 {
-                    return choice;
+                    int choice = int.Parse(input);
+                    if (choice >= 1 && choice <= options.Length)
+                    {
+                        return choice;
+                    }
+                    Console.WriteLine("Invalid choice. Enter a valid number from the menu.");
                 }
-
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"  ✗ Please enter a number between 1 and {options.Length}.");
-                Console.ResetColor();
+                catch (Exception)
+                {
+                    Console.WriteLine("Invalid input. Please enter a number.");
+                }
             }
         }
 
-        internal static string PickMeasurementType(IEnumerable<string> allowedTypes)
+        internal static string PickMeasurementType(string[] allowedTypes)
         {
-            Console.WriteLine();
-            string[] types = allowedTypes.ToArray();
-            string[] menuItems = types.Select((t, i) => $"{i + 1}. {t}").ToArray();
-            int choice = PickFromMenu("Select Measurement Type", menuItems);
-            return types[choice - 1];
+            int choice = PickFromMenu("Select Measurement Type", allowedTypes);
+            return allowedTypes[choice - 1];
         }
 
         internal static string PickUnit(string prompt, string[] units)
         {
-            Console.WriteLine();
-            string[] menuItems = units.Select((u, i) => $"{i + 1}. {u}").ToArray();
-            int choice = PickFromMenu(prompt, menuItems);
+            int choice = PickFromMenu(prompt, units);
             return units[choice - 1];
         }
 
         internal static QuantityDTO ReadQuantity(string label, string measurementType, string[] units)
         {
-            string unit = PickUnit(label + " – pick unit", units);
-            double value = ReadDouble($"  Enter value in {unit}: ");
+            string unit = PickUnit(label + " Unit", units);
+            double value = ReadDouble("Enter " + label + " Value (" + unit + "): ");
             return new QuantityDTO(value, unit, measurementType);
         }
 
@@ -84,26 +66,17 @@ namespace QuantityMeasurementApp.App
             while (true)
             {
                 Console.Write(prompt);
-                if (double.TryParse(Console.ReadLine()?.Trim(),
-                        NumberStyles.Any,
-                        CultureInfo.InvariantCulture,
-                        out double value))
+                string input = Console.ReadLine();
+                try
                 {
+                    double value = double.Parse(input);
                     return value;
                 }
-
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("  ✗ Invalid number. Please try again.");
-                Console.ResetColor();
+                catch (Exception)
+                {
+                    Console.WriteLine("Invalid number.");
+                }
             }
-        }
-
-        internal static void Bye()
-        {
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("\n  👋  Thanks for using Quantity Measurement App. Goodbye!\n");
-            Console.ResetColor();
         }
     }
 }

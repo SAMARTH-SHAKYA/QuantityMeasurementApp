@@ -11,7 +11,7 @@ namespace QuantityMeasurementApp.Controller
 
         public QuantityMeasurementController(IQuantityMeasurementService service)
         {
-            this.service = service ?? throw new ArgumentNullException(nameof(service));
+            this.service = service;
         }
 
         public void PerformComparison(QuantityDTO q1, QuantityDTO q2)

@@ -10,11 +10,6 @@ namespace QuantityMeasurementApp.Entity
 
         public QuantityModel(double value, U unit)
         {
-            if (unit == null)
-            {
-                throw new ArgumentNullException(nameof(unit), "Unit cannot be null");
-            }
-
             if (!double.IsFinite(value))
             {
                 throw new ArgumentException("Value must be a finite number.");

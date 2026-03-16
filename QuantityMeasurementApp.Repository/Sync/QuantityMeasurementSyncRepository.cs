@@ -18,7 +18,7 @@ namespace QuantityMeasurementApp.Repository
             IQuantityMeasurementRepository? databaseRepository,
             PendingSyncStore? pendingStore = null)
         {
-            _cache = cacheRepository ?? throw new ArgumentNullException(nameof(cacheRepository));
+            _cache = cacheRepository;
             _database = databaseRepository; // allowed to be null (offline mode)
             _pendingStore = pendingStore ?? new PendingSyncStore();
         }
@@ -48,12 +48,12 @@ namespace QuantityMeasurementApp.Repository
             }
         }
 
-        public IEnumerable<QuantityMeasurementEntity> GetAllMeasurements() => _cache.GetAllMeasurements();
+        public List<QuantityMeasurementEntity> GetAllMeasurements() => _cache.GetAllMeasurements();
 
-        public IEnumerable<QuantityMeasurementEntity> GetMeasurementsByOperation(string operationType) =>
+        public List<QuantityMeasurementEntity> GetMeasurementsByOperation(string operationType) =>
             _cache.GetMeasurementsByOperation(operationType);
 
-        public IEnumerable<QuantityMeasurementEntity> GetMeasurementsByType(string measurementType) =>
+        public List<QuantityMeasurementEntity> GetMeasurementsByType(string measurementType) =>
             _cache.GetMeasurementsByType(measurementType);
 
         public int GetTotalCount() => _cache.GetTotalCount();
@@ -61,7 +61,7 @@ namespace QuantityMeasurementApp.Repository
         public void DeleteAll()
         {
             _cache.DeleteAll();
-            _pendingStore.OverwriteAll(Array.Empty<QuantityMeasurementEntity>());
+            _pendingStore.OverwriteAll(new List<QuantityMeasurementEntity>());
 
             // Optional: if DB is available, clear it too to keep both stores aligned for dev/testing.
             try

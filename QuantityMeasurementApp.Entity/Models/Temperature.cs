@@ -5,52 +5,73 @@ namespace QuantityMeasurementApp.Entity
     public class TemperatureUnit : IMeasurable
     {
         // Base Unit: Celsius
-        public static readonly TemperatureUnit Celsius = new TemperatureUnit(
-            "Celsius",
-            c => c,
-            c => c);
-
-        public static readonly TemperatureUnit Fahrenheit = new TemperatureUnit(
-            "Fahrenheit",
-            f => (f - 32.0) * 5.0 / 9.0,
-            c => (c * 9.0 / 5.0) + 32.0);
-
-        public static readonly TemperatureUnit Kelvin = new TemperatureUnit(
-            "Kelvin",
-            k => k - 273.15,
-            c => c + 273.15);
+        public static readonly TemperatureUnit Celsius = new TemperatureUnit("Celsius");
+        public static readonly TemperatureUnit Fahrenheit = new TemperatureUnit("Fahrenheit");
+        public static readonly TemperatureUnit Kelvin = new TemperatureUnit("Kelvin");
 
         private readonly string name;
-        private readonly Func<double, double> toBase;
-        private readonly Func<double, double> fromBase;
 
-        private TemperatureUnit(string name, Func<double, double> toBase, Func<double, double> fromBase)
+        private TemperatureUnit(string name)
         {
             this.name = name;
-            this.toBase = toBase;
-            this.fromBase = fromBase;
         }
 
-        // Dummy conversion factor since temperature uses non-linear lambda functions
+        // Dummy conversion factor since temperature uses non-linear functions
         public double GetConversionFactor() => 1.0;
 
-        public double ConvertToBaseUnit(double value) => toBase(value);
+        public double ConvertToBaseUnit(double value)
+        {
+            switch (name)
+            {
+                case "Celsius":
+                    return value;
+                case "Fahrenheit":
+                    return (value - 32.0) * 5.0 / 9.0;
+                case "Kelvin":
+                    return value - 273.15;
+                default:
+                    throw new ArgumentException("Unknown temperature unit.");
+            }
+        }
 
-        public double ConvertFromBaseUnit(double baseValue) => fromBase(baseValue);
+        public double ConvertFromBaseUnit(double baseValue)
+        {
+            switch (name)
+            {
+                case "Celsius":
+                    return baseValue;
+                case "Fahrenheit":
+                    return (baseValue * 9.0 / 5.0) + 32.0;
+                case "Kelvin":
+                    return baseValue + 273.15;
+                default:
+                    throw new ArgumentException("Unknown temperature unit.");
+            }
+        }
 
         public string GetUnitName() => name;
 
         public string GetMeasurementType() => "Temperature";
 
-        public IMeasurable GetUnitInstance(string name)
+        public IMeasurable GetUnitInstance(string unitName)
         {
-            return name.ToUpper() switch
+            string upperName = unitName.ToUpper();
+            if (upperName == "CELSIUS")
             {
-                "CELSIUS" => Celsius,
-                "FAHRENHEIT" => Fahrenheit,
-                "KELVIN" => Kelvin,
-                _ => throw new ArgumentException($"Invalid Temperature unit: {name}")
-            };
+                return Celsius;
+            }
+            else if (upperName == "FAHRENHEIT")
+            {
+                return Fahrenheit;
+            }
+            else if (upperName == "KELVIN")
+            {
+                return Kelvin;
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid Temperature unit: {unitName}");
+            }
         }
 
         // UC14: Opt-out of Arithmetic Operations

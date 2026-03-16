@@ -1,119 +1,95 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using QuantityMeasurementApp.Controller;
 using QuantityMeasurementApp.Entity;
 
 namespace QuantityMeasurementApp.App
 {
-
     public class Menu : IMenu
     {
         private readonly QuantityMeasurementController _controller;
 
         public Menu(QuantityMeasurementController controller)
         {
-            _controller = controller ?? throw new ArgumentNullException(nameof(controller));
+            _controller = controller;
         }
-
-        // ─── IMenu ────────────────────────────────────────────────────────────
 
         public void Run()
         {
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
-
             while (true)
             {
-                MenuHelpers.PrintHeader();
-                int opChoice = MenuHelpers.PickFromMenu("Select Operation",
-                    "1. Compare two quantities",
-                    "2. Convert a quantity",
-                    "3. Add two quantities",
-                    "4. Subtract two quantities",
-                    "5. Divide two quantities",
-                    "6. Exit");
+                string[] operations = new string[]
+                {
+                    "Compare two quantities",
+                    "Convert a quantity",
+                    "Add two quantities",
+                    "Subtract two quantities",
+                    "Divide two quantities",
+                    "Exit"
+                };
+
+                int opChoice = MenuHelpers.PickFromMenu("Select Operation", operations);
 
                 if (opChoice == 6)
                 {
-                    MenuHelpers.Bye();
+                    Console.WriteLine("Goodbye.");
                     return;
                 }
 
+                
+                string[] allKeys = new string[] { "Length", "Volume", "Weight", "Temperature" };
                 string[] allowedTypes;
+
                 if (opChoice == 1 || opChoice == 2)
                 {
-                    allowedTypes = MenuHelpers.Units.Keys.ToArray();
+                    allowedTypes = allKeys;
                 }
                 else
                 {
-                    allowedTypes = MenuHelpers.Units.Keys
-                        .Where(t => !t.Equals("Temperature", StringComparison.OrdinalIgnoreCase))
-                        .ToArray();
+                    // Arithmetic operations don't support Temperature
+                    allowedTypes = new string[] { "Length", "Volume", "Weight" };
                 }
 
-                string   measurementType = MenuHelpers.PickMeasurementType(allowedTypes);
-                string[] available       = MenuHelpers.Units[measurementType];
+                string measurementType = MenuHelpers.PickMeasurementType(allowedTypes);
+                string[] available = MenuHelpers.Units[measurementType];
 
-                Console.WriteLine();
                 switch (opChoice)
                 {
-                    // ── 1. COMPARE ───────────────────────────────────────────
                     case 1:
-                    {
-                        var q1 = MenuHelpers.ReadQuantity("First  quantity", measurementType, available);
-                        var q2 = MenuHelpers.ReadQuantity("Second quantity", measurementType, available);
-                        Console.WriteLine();
-                        _controller.PerformComparison(q1, q2);
+                        _controller.PerformComparison(
+                            MenuHelpers.ReadQuantity("1st Quantity", measurementType, available),
+                            MenuHelpers.ReadQuantity("2nd Quantity", measurementType, available));
                         break;
-                    }
 
-                    // ── 2. CONVERT ───────────────────────────────────────────
                     case 2:
-                    {
-                        var    src    = MenuHelpers.ReadQuantity("Source quantity", measurementType, available);
-                        string target = MenuHelpers.PickUnit("Convert TO", available);
-                        Console.WriteLine();
-                        _controller.PerformConversion(src, target);
+                        _controller.PerformConversion(
+                            MenuHelpers.ReadQuantity("Source", measurementType, available),
+                            MenuHelpers.PickUnit("Convert To", available));
                         break;
-                    }
 
-                    // ── 3. ADD ────────────────────────────────────────────────
                     case 3:
-                    {
-                        var    q1     = MenuHelpers.ReadQuantity("First  quantity", measurementType, available);
-                        var    q2     = MenuHelpers.ReadQuantity("Second quantity", measurementType, available);
-                        string target = MenuHelpers.PickUnit("Result unit", available);
-                        Console.WriteLine();
-                        _controller.PerformAddition(q1, q2, target);
+                        _controller.PerformAddition(
+                            MenuHelpers.ReadQuantity("1st Quantity", measurementType, available),
+                            MenuHelpers.ReadQuantity("2nd Quantity", measurementType, available),
+                            MenuHelpers.PickUnit("Result Unit", available));
                         break;
-                    }
 
-                    // ── 4. SUBTRACT ───────────────────────────────────────────
                     case 4:
-                    {
-                        var    q1     = MenuHelpers.ReadQuantity("First  quantity", measurementType, available);
-                        var    q2     = MenuHelpers.ReadQuantity("Second quantity", measurementType, available);
-                        string target = MenuHelpers.PickUnit("Result unit", available);
-                        Console.WriteLine();
-                        _controller.PerformSubtraction(q1, q2, target);
+                        _controller.PerformSubtraction(
+                            MenuHelpers.ReadQuantity("1st Quantity", measurementType, available),
+                            MenuHelpers.ReadQuantity("2nd Quantity", measurementType, available),
+                            MenuHelpers.PickUnit("Result Unit", available));
                         break;
-                    }
 
-                    // ── 5. DIVIDE ─────────────────────────────────────────────
                     case 5:
-                    {
-                        var q1 = MenuHelpers.ReadQuantity("Numerator   quantity", measurementType, available);
-                        var q2 = MenuHelpers.ReadQuantity("Denominator quantity", measurementType, available);
-                        Console.WriteLine();
-                        _controller.PerformDivision(q1, q2);
+                        _controller.PerformDivision(
+                            MenuHelpers.ReadQuantity("Numerator", measurementType, available),
+                            MenuHelpers.ReadQuantity("Denominator", measurementType, available));
                         break;
-                    }
                 }
 
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.WriteLine("\nPress any key to return to main menu...");
-                Console.ResetColor();
+                Console.WriteLine("\nPress any key to return to menu...");
                 Console.ReadKey(true);
+                Console.Clear();
             }
         }
     }
