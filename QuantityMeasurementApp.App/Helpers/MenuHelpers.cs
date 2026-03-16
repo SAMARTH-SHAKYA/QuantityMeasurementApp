@@ -55,10 +55,10 @@ namespace QuantityMeasurementApp.App
             }
         }
 
-        internal static string PickMeasurementType()
+        internal static string PickMeasurementType(IEnumerable<string> allowedTypes)
         {
             Console.WriteLine();
-            string[] types = Units.Keys.ToArray();
+            string[] types = allowedTypes.ToArray();
             string[] menuItems = types.Select((t, i) => $"{i + 1}. {t}").ToArray();
             int choice = PickFromMenu("Select Measurement Type", menuItems);
             return types[choice - 1];

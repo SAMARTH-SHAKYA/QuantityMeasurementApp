@@ -39,7 +39,19 @@ namespace QuantityMeasurementApp.App
                     return;
                 }
 
-                string   measurementType = MenuHelpers.PickMeasurementType();
+                string[] allowedTypes;
+                if (opChoice == 1 || opChoice == 2)
+                {
+                    allowedTypes = MenuHelpers.Units.Keys.ToArray();
+                }
+                else
+                {
+                    allowedTypes = MenuHelpers.Units.Keys
+                        .Where(t => !t.Equals("Temperature", StringComparison.OrdinalIgnoreCase))
+                        .ToArray();
+                }
+
+                string   measurementType = MenuHelpers.PickMeasurementType(allowedTypes);
                 string[] available       = MenuHelpers.Units[measurementType];
 
                 Console.WriteLine();
