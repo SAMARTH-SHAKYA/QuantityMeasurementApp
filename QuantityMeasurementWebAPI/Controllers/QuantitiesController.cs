@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuantityMeasurementApp.Entity;
 using QuantityMeasurementApp.Repository;
@@ -10,7 +9,6 @@ namespace QuantityMeasurementWebAPI.Controllers
 {
     [ApiController]
     [Route("api/measurement")]
-    [Authorize]
     public class QuantitiesController : ControllerBase
     {
         private readonly IQuantityMeasurementService _service;

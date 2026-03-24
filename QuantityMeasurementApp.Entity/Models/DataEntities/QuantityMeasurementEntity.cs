@@ -23,7 +23,6 @@ namespace QuantityMeasurementApp.Entity
         public QuantityMeasurementEntity() { }
 
         // Used by System.Text.Json deserialization (cache + pending sync files).
-        [JsonConstructor]
         public QuantityMeasurementEntity(
             string firstOperand,
             string secondOperand,
