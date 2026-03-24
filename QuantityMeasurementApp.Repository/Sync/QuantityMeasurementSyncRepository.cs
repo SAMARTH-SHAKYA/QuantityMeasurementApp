@@ -16,8 +16,8 @@ namespace QuantityMeasurementApp.Repository.Sync
             IQuantityMeasurementRepository databaseRepository)
         {
             _database = databaseRepository;
-            _pendingStore = new PendingSyncStore("measurement_pending.json");
-            _historyStore = new PendingSyncStore("measurement_history.json");
+            _pendingStore = new PendingSyncStore(System.IO.Path.Combine("Data", "measurement_pending.json"));
+            _historyStore = new PendingSyncStore(System.IO.Path.Combine("Data", "measurement_history.json"));
         }
 
         public void SaveMeasurement(QuantityMeasurementEntity measurement)

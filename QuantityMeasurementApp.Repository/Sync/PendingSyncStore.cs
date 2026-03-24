@@ -12,7 +12,7 @@ namespace QuantityMeasurementApp.Repository
         private readonly string _pendingFilePath;
         private static readonly object LockObject = new object();
 
-        public PendingSyncStore(string pendingFilePath = "measurement_pending_sync.json")
+        public PendingSyncStore(string pendingFilePath = "Data/measurement_pending_sync.json")
         {
             _pendingFilePath = pendingFilePath;
         }
@@ -73,6 +73,10 @@ namespace QuantityMeasurementApp.Repository
             {
                 var options = new JsonSerializerOptions { WriteIndented = true };
                 string json = JsonSerializer.Serialize(entities, options);
+                
+                var dir = Path.GetDirectoryName(_pendingFilePath);
+                if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+                
                 File.WriteAllText(_pendingFilePath, json);
             }
             catch (Exception ex)

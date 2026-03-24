@@ -9,8 +9,11 @@ using QuantityMeasurementApp.Repository;
 using QuantityMeasurementApp.Repository.Database;
 using QuantityMeasurementApp.Repository.Sync;
 using QuantityMeasurementApp.Service;
+using QuantityMeasurementApp.Service.Interface;
+using QuantityMeasurementWebAPI.Middleware;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -102,6 +105,8 @@ builder.Services.AddAuthentication(options =>
 });
 
 var app = builder.Build();
+
+app.UseMiddleware<GlobalExceptionHandler>();
 
 // Configure the HTTP request pipeline.
 app.UseSwagger();

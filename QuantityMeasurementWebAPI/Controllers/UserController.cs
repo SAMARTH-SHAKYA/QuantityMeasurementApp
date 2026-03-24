@@ -2,8 +2,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuantityMeasurementApp.Service;
+using QuantityMeasurementApp.Service.Interface;
 
-namespace QuantityMeasurementApp.Controller
+namespace QuantityMeasurementWebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

@@ -6,17 +6,17 @@ using QuantityMeasurementApp.Entity;
 using QuantityMeasurementApp.Repository;
 using QuantityMeasurementApp.Service;
 
-namespace QuantityMeasurementApp.Controller
+namespace QuantityMeasurementWebAPI.Controllers
 {
     [ApiController]
     [Route("api/measurement")]
     [Authorize]
-    public class QuantityMeasurementController : ControllerBase
+    public class QuantitiesController : ControllerBase
     {
         private readonly IQuantityMeasurementService _service;
         private readonly IQuantityMeasurementRepository _repository;
 
-        public QuantityMeasurementController(IQuantityMeasurementService service, IQuantityMeasurementRepository repository)
+        public QuantitiesController(IQuantityMeasurementService service, IQuantityMeasurementRepository repository)
         {
             _service = service;
             _repository = repository;

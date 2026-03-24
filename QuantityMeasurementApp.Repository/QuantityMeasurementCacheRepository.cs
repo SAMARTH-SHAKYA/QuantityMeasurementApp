@@ -13,7 +13,7 @@ namespace QuantityMeasurementApp.Repository
         private static readonly object lockObject = new object();
 
         private readonly List<QuantityMeasurementEntity> measurementCache;
-        private readonly string filePath = "measurement_history.json";
+        private readonly string filePath = Path.Combine("Data", "measurement_history.json");
 
         // Private constructor for Singleton pattern
         private QuantityMeasurementCacheRepository()
@@ -75,6 +75,7 @@ namespace QuantityMeasurementApp.Repository
                     PropertyNameCaseInsensitive = true
                 };
                 string jsonString = JsonSerializer.Serialize(measurementCache, options);
+                Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
                 File.WriteAllText(filePath, jsonString);
             }
             catch (Exception ex)

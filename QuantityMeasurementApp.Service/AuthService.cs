@@ -8,15 +8,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using QuantityMeasurementApp.Entity.Models;
 using QuantityMeasurementApp.Repository.Database;
+using QuantityMeasurementApp.Service.Interface;
 
 namespace QuantityMeasurementApp.Service
 {
-    public interface IAuthService
-    {
-        Task<User?> RegisterUserAsync(string email, string password, string phoneNumber);
-        Task<string?> LoginAsync(string email, string password);
-    }
-
     public class AuthService : IAuthService
     {
         private readonly AppDbContext _context;
