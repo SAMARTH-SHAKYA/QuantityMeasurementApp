@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using QuantityMeasurementApp.Entity;
+using QuantityMeasurementApp.Entity.Entities;
 
 namespace QuantityMeasurementApp.Repository.Database
 {
@@ -10,5 +11,6 @@ namespace QuantityMeasurementApp.Repository.Database
         }
 
         public DbSet<QuantityMeasurementEntity> Measurements { get; set; }
+        public DbSet<UserEntity> Users { get; set; }
     }
 }
