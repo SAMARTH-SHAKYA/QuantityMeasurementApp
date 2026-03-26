@@ -100,6 +100,13 @@ builder.Services.AddRateLimiter(options =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Configure Redis Cache
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("RedisCache");
+    options.InstanceName = "QuantityMeasurement_";
+});
+
 // Configure Repositories
 builder.Services.AddScoped<QuantityMeasurementDatabaseRepository>();
 builder.Services.AddScoped<IQuantityMeasurementRepository>(provider => 

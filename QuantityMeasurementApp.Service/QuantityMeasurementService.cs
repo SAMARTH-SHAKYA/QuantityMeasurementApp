@@ -29,6 +29,20 @@ namespace QuantityMeasurementApp.Service
                     return WeightUnit.Kilogram.GetUnitInstance(dto.Unit);
                 case "TEMPERATURE":
                     return TemperatureUnit.Celsius.GetUnitInstance(dto.Unit);
+                case "AREA":
+                    return AreaUnit.SqFeet.GetUnitInstance(dto.Unit);
+                case "SPEED":
+                    return SpeedUnit.Kmph.GetUnitInstance(dto.Unit);
+                case "TIME":
+                    return TimeUnit.Second.GetUnitInstance(dto.Unit);
+                case "ENERGY":
+                    return EnergyUnit.Joule.GetUnitInstance(dto.Unit);
+                case "PRESSURE":
+                    return PressureUnit.Pascal.GetUnitInstance(dto.Unit);
+                case "ANGLE":
+                    return AngleUnit.Degree.GetUnitInstance(dto.Unit);
+                case "POWER":
+                    return PowerUnit.Watt.GetUnitInstance(dto.Unit);
                 default:
                     throw new QuantityMeasurementException($"Unsupported Measurement Type: {dto.MeasurementType}");
             }
@@ -136,6 +150,11 @@ namespace QuantityMeasurementApp.Service
             return PerformArithmetic(q1, q2, targetUnitName, "Subtraction");
         }
 
+        public QuantityDTO Multiply(QuantityDTO q1, QuantityDTO q2, string targetUnitName)
+        {
+            return PerformArithmetic(q1, q2, targetUnitName, "Multiplication");
+        }
+
         public QuantityDTO Divide(QuantityDTO q1, QuantityDTO q2)
         {
             try
@@ -199,6 +218,10 @@ namespace QuantityMeasurementApp.Service
                 {
                     baseResult = baseVal1 - baseVal2;
                 }
+                else if (operationName == "Multiplication")
+                {
+                    baseResult = baseVal1 * baseVal2;
+                }
                 else
                 {
                     throw new QuantityMeasurementException("Unsupported Arithmetic Operation: " + operationName);
@@ -224,7 +247,7 @@ namespace QuantityMeasurementApp.Service
             {
                 if (q1.MeasurementType.Equals("Temperature", StringComparison.OrdinalIgnoreCase))
                 {
-                    ex = new QuantityMeasurementException("Temperature does not support Addition/Subtraction operations.", ex);
+                    ex = new QuantityMeasurementException("Temperature does not support arithmetic operations.", ex);
                 }
                 var entity = new QuantityMeasurementEntity(q1.ToString(), q2.ToString(), operationName, ex.Message, true);
                 repository.SaveMeasurement(entity);

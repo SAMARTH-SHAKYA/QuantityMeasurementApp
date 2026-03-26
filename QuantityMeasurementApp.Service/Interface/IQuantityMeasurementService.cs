@@ -10,6 +10,7 @@ namespace QuantityMeasurementApp.Service
         QuantityDTO Add(QuantityDTO q1, QuantityDTO q2, string targetUnitName);
         QuantityDTO Subtract(QuantityDTO q1, QuantityDTO q2, string targetUnitName);
         QuantityDTO Divide(QuantityDTO q1, QuantityDTO q2);
+        QuantityDTO Multiply(QuantityDTO q1, QuantityDTO q2, string targetUnitName);
     }
 }
 
