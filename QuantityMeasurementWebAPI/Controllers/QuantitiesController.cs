@@ -27,6 +27,12 @@ namespace QuantityMeasurementWebAPI.Controllers
             _cache = cache;
         }
 
+        private void SafeRemoveCache(string key)
+        {
+            try { _cache.Remove(key); }
+            catch (Exception ex) { Console.WriteLine($"Cache failure: {ex.Message}"); }
+        }
+
         public class ConvertRequest
         {
             public QuantityDTO Source { get; set; } = null!;
@@ -52,7 +58,7 @@ namespace QuantityMeasurementWebAPI.Controllers
             try
             {
                 var result = _service.Convert(request.Source, request.TargetUnit);
-                _cache.Remove(HistoryCacheKey);
+                SafeRemoveCache(HistoryCacheKey);
                 return Ok(result);
             }
             catch (QuantityMeasurementException ex)
@@ -72,7 +78,7 @@ namespace QuantityMeasurementWebAPI.Controllers
             {
                 var result = _service.Compare(request.Quantity1, request.Quantity2);
                 bool areEqual = result.Value == 1.0;
-                _cache.Remove(HistoryCacheKey);
+                SafeRemoveCache(HistoryCacheKey);
                 return Ok(new { AreEqual = areEqual });
             }
             catch (QuantityMeasurementException ex)
@@ -91,7 +97,7 @@ namespace QuantityMeasurementWebAPI.Controllers
             try
             {
                 var result = _service.Add(request.Quantity1, request.Quantity2, request.TargetUnit);
-                _cache.Remove(HistoryCacheKey);
+                SafeRemoveCache(HistoryCacheKey);
                 return Ok(result);
             }
             catch (QuantityMeasurementException ex)
@@ -110,7 +116,7 @@ namespace QuantityMeasurementWebAPI.Controllers
             try
             {
                 var result = _service.Subtract(request.Quantity1, request.Quantity2, request.TargetUnit);
-                _cache.Remove(HistoryCacheKey);
+                SafeRemoveCache(HistoryCacheKey);
                 return Ok(result);
             }
             catch (QuantityMeasurementException ex)
@@ -129,7 +135,27 @@ namespace QuantityMeasurementWebAPI.Controllers
             try
             {
                 var result = _service.Multiply(request.Quantity1, request.Quantity2, request.TargetUnit);
-                _cache.Remove(HistoryCacheKey);
+                SafeRemoveCache(HistoryCacheKey);
+                return Ok(result);
+            }
+            catch (QuantityMeasurementException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPost("divide")]
+        public IActionResult Divide([FromBody] ArithmeticRequest request)
+        {
+            try
+            {
+                // The backend Divide interface typically takes two args, returning Ratio
+                var result = _service.Divide(request.Quantity1, request.Quantity2);
+                SafeRemoveCache(HistoryCacheKey);
                 return Ok(result);
             }
             catch (QuantityMeasurementException ex)
@@ -147,20 +173,28 @@ namespace QuantityMeasurementWebAPI.Controllers
         {
             try
             {
-                var cachedHistory = _cache.GetString(HistoryCacheKey);
-                if (!string.IsNullOrEmpty(cachedHistory))
+                try
                 {
-                    var cachedResults = JsonSerializer.Deserialize<List<QuantityMeasurementEntity>>(cachedHistory);
-                    return Ok(cachedResults);
+                    var cachedHistory = _cache.GetString(HistoryCacheKey);
+                    if (!string.IsNullOrEmpty(cachedHistory))
+                    {
+                        var cachedResults = JsonSerializer.Deserialize<List<QuantityMeasurementEntity>>(cachedHistory);
+                        return Ok(cachedResults);
+                    }
                 }
+                catch (Exception ex) { Console.WriteLine($"Cache read failure: {ex.Message}"); }
 
                 var results = _repository.GetAllMeasurements();
 
-                var cacheOptions = new DistributedCacheEntryOptions
+                try
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
-                };
-                _cache.SetString(HistoryCacheKey, JsonSerializer.Serialize(results), cacheOptions);
+                    var cacheOptions = new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+                    };
+                    _cache.SetString(HistoryCacheKey, JsonSerializer.Serialize(results), cacheOptions);
+                }
+                catch (Exception ex) { Console.WriteLine($"Cache write failure: {ex.Message}"); }
 
                 return Ok(results);
             }

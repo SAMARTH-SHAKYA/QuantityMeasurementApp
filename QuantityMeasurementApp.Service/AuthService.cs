@@ -70,8 +70,8 @@ namespace QuantityMeasurementApp.Service
 
         private string GenerateJwtToken(UserEntity user)
         {
-            var jwtSettings = _configuration.GetSection("Jwt");
-            var key = Encoding.ASCII.GetBytes(jwtSettings["Key"] ?? "super_secret_key_that_is_long_enough_for_hmac_sha256");
+            var jwtSettings = _configuration.GetSection("JwtSettings");
+            var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"] ?? "super_secret_key_that_is_long_enough_for_hmac_sha256");
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -82,7 +82,7 @@ namespace QuantityMeasurementApp.Service
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.Username)
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(double.Parse(jwtSettings["DurationInMinutes"] ?? "60")),
+                Expires = DateTime.UtcNow.AddMinutes(double.Parse(jwtSettings["ExpiryMinutes"] ?? "60")),
                 Issuer = jwtSettings["Issuer"],
                 Audience = jwtSettings["Audience"],
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

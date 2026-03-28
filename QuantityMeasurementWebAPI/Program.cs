@@ -69,9 +69,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "QuantityMeasurementApp",
-            ValidAudience = builder.Configuration["Jwt:Audience"] ?? "QuantityMeasurementApp",
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "super_secret_key_that_is_long_enough_for_hmac_sha256"))
+            ValidIssuer = builder.Configuration["JwtSettings:Issuer"] ?? "QuantityMeasurementApp",
+            ValidAudience = builder.Configuration["JwtSettings:Audience"] ?? "QuantityMeasurementApp",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"] ?? "super_secret_key_that_is_long_enough_for_hmac_sha256"))
         };
     });
 
