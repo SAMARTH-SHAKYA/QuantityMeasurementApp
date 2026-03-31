@@ -53,7 +53,12 @@ namespace QuantityMeasurementApp.Service
         {
             var user = await _context.Set<UserEntity>().FirstOrDefaultAsync(u => u.Username == dto.Username);
             
-            if (user == null || !HashingHelper.VerifyPassword(user.PasswordHash, dto.Password))
+            if (user == null)
+            {
+                throw new Exception("not register");
+            }
+
+            if (!HashingHelper.VerifyPassword(user.PasswordHash, dto.Password))
             {
                 throw new Exception("Invalid username or password.");
             }
