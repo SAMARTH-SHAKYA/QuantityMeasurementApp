@@ -15,10 +15,6 @@ using QuantityMeasurementWebAPI.Middleware;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using System.IO;
-using System;
-
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
