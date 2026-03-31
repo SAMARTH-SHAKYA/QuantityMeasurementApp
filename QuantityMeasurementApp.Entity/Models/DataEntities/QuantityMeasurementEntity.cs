@@ -40,7 +40,7 @@ namespace QuantityMeasurementApp.Entity
             this.FinalResult = finalResult ?? "Error";
             this.HasError = hasError;
             this.ErrorMessage = errorMessage ?? "None";
-            this.Timestamp = timestamp == default ? DateTime.Now : timestamp;
+            this.Timestamp = timestamp == default ? DateTime.UtcNow : timestamp;
         }
 
         // Constructor for Single Operand Operations (e.g., Conversion)
@@ -53,7 +53,7 @@ namespace QuantityMeasurementApp.Entity
                 result,
                 false,
                 "None",
-                DateTime.Now)
+                DateTime.UtcNow)
         { }
 
         // Constructor for Binary Operand Operations (e.g., Addition, Comparison)
@@ -66,7 +66,7 @@ namespace QuantityMeasurementApp.Entity
                 result,
                 false,
                 "None",
-                DateTime.Now)
+                DateTime.UtcNow)
         { }
 
         // Constructor for Error scenarios
@@ -79,7 +79,7 @@ namespace QuantityMeasurementApp.Entity
                 "Error",
                 hasError,
                 errorMessage,
-                DateTime.Now)
+                DateTime.UtcNow)
         { }
 
         public override string ToString()
