@@ -96,9 +96,9 @@ builder.Services.AddRateLimiter(options =>
 });
 
 
-// Configure Entity Framework Core with SQL Server
+// Configure Entity Framework Core with PostgreSQL
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Configure Redis Cache
 builder.Services.AddStackExchangeRedisCache(options =>

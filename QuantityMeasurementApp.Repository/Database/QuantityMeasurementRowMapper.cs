@@ -1,12 +1,12 @@
 using System;
-using Microsoft.Data.SqlClient;
+using System.Data.Common;
 using QuantityMeasurementApp.Entity;
 
 namespace QuantityMeasurementApp.Repository
 {
     public static class QuantityMeasurementRowMapper
     {
-        public static QuantityMeasurementEntity MapRow(SqlDataReader reader)
+        public static QuantityMeasurementEntity MapRow(DbDataReader reader)
         {
             string firstOperand = reader.GetString(reader.GetOrdinal("FirstOperand"));
             string secondOperand = reader.GetString(reader.GetOrdinal("SecondOperand"));
