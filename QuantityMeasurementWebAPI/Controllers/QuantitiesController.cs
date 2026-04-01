@@ -32,7 +32,8 @@ namespace QuantityMeasurementWebAPI.Controllers
         {
             if (User?.Identity?.IsAuthenticated == true)
             {
-                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                // "uid" is our custom claim - unambiguous, never remapped by .NET JWT middleware
+                var idClaim = User.FindFirst("uid");
                 if (idClaim != null && int.TryParse(idClaim.Value, out int id))
                 {
                     return id;
