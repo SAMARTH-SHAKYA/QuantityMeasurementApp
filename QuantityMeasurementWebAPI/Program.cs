@@ -15,6 +15,12 @@ using QuantityMeasurementWebAPI.Middleware;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using System.IdentityModel.Tokens.Jwt;
+
+// CRITICAL: Prevent .NET from automatically mapping JWT 'sub' claim to
+// ClaimTypes.NameIdentifier, which would overwrite our explicit integer userId claim.
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
