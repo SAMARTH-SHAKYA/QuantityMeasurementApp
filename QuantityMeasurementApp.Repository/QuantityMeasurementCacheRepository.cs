@@ -47,12 +47,17 @@ namespace QuantityMeasurementApp.Repository
             }
         }
 
-        public List<QuantityMeasurementEntity> GetAllMeasurements()
+        public List<QuantityMeasurementEntity> GetMeasurementsForUser(int? userId)
         {
             lock (lockObject)
             {
                 // Return a copy to prevent external modification
-                return new List<QuantityMeasurementEntity>(measurementCache);
+                var query = measurementCache.AsEnumerable();
+                if (userId.HasValue)
+                {
+                    query = query.Where(m => m.UserId == userId.Value);
+                }
+                return query.ToList();
             }
         }
 

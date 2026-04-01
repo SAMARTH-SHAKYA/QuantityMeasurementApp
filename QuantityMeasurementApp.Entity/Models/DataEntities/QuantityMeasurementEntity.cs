@@ -11,6 +11,8 @@ namespace QuantityMeasurementApp.Entity
         [Key]
         public int Id { get; set; }
 
+        public int? UserId { get; set; }
+
         public string FirstOperand { get; set; } = string.Empty;
         public string SecondOperand { get; set; } = string.Empty;
         public string OperationType { get; set; } = string.Empty;
@@ -31,7 +33,8 @@ namespace QuantityMeasurementApp.Entity
             string finalResult,
             bool hasError,
             string errorMessage,
-            DateTime timestamp)
+            DateTime timestamp,
+            int? userId = null)
         {
             this.FirstOperand = firstOperand ?? "Unknown";
             this.SecondOperand = secondOperand ?? "Unknown";
@@ -41,10 +44,11 @@ namespace QuantityMeasurementApp.Entity
             this.HasError = hasError;
             this.ErrorMessage = errorMessage ?? "None";
             this.Timestamp = timestamp == default ? DateTime.UtcNow : timestamp;
+            this.UserId = userId;
         }
 
         // Constructor for Single Operand Operations (e.g., Conversion)
-        public QuantityMeasurementEntity(string operand, string operationType, string result, string measurementType = "N/A")
+        public QuantityMeasurementEntity(string operand, string operationType, string result, string measurementType = "N/A", int? userId = null)
             : this(
                 operand,
                 "N/A",
@@ -53,11 +57,12 @@ namespace QuantityMeasurementApp.Entity
                 result,
                 false,
                 "None",
-                DateTime.UtcNow)
+                DateTime.UtcNow,
+                null)
         { }
 
         // Constructor for Binary Operand Operations (e.g., Addition, Comparison)
-        public QuantityMeasurementEntity(string firstOperand, string secondOperand, string operationType, string result, string measurementType = "N/A")
+        public QuantityMeasurementEntity(string firstOperand, string secondOperand, string operationType, string result, string measurementType = "N/A", int? userId = null)
             : this(
                 firstOperand,
                 secondOperand,
@@ -66,11 +71,12 @@ namespace QuantityMeasurementApp.Entity
                 result,
                 false,
                 "None",
-                DateTime.UtcNow)
+                DateTime.UtcNow,
+                userId)
         { }
 
         // Constructor for Error scenarios
-        public QuantityMeasurementEntity(string firstOperand, string secondOperand, string operationType, string errorMessage, bool hasError, string measurementType = "N/A")
+        public QuantityMeasurementEntity(string firstOperand, string secondOperand, string operationType, string errorMessage, bool hasError, string measurementType = "N/A", int? userId = null)
             : this(
                 firstOperand ?? "Unknown",
                 secondOperand ?? "Unknown",
@@ -79,7 +85,8 @@ namespace QuantityMeasurementApp.Entity
                 "Error",
                 hasError,
                 errorMessage,
-                DateTime.UtcNow)
+                DateTime.UtcNow,
+                userId)
         { }
 
         public override string ToString()

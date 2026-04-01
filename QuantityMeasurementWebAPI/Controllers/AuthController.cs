@@ -47,5 +47,20 @@ namespace QuantityMeasurementWebAPI.Controllers
                 return Unauthorized(new { Error = ex.Message });
             }
         }
+
+        [HttpPost("google-login")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginDTO dto)
+        {
+            try
+            {
+                var result = await _authService.GoogleLoginAsync(dto);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized(new { Error = ex.Message });
+            }
+        }
     }
 }

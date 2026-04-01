@@ -7,5 +7,6 @@ namespace QuantityMeasurementApp.Service.Interface
     {
         Task<AuthResponseDTO> RegisterAsync(RegisterDTO dto);
         Task<AuthResponseDTO> LoginAsync(LoginDTO dto);
+        Task<AuthResponseDTO> GoogleLoginAsync(GoogleLoginDTO dto);
     }
 }

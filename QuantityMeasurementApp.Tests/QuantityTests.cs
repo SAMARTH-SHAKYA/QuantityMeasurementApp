@@ -203,17 +203,17 @@ namespace QuantityMeasurementApp.Tests
         public void testRepository_TracksOperation()
         {
             // Count before
-            int initialCount = repository.GetAllMeasurements().Count();
+            int initialCount = repository.GetMeasurementsForUser(null).Count();
 
             QuantityDTO first = new QuantityDTO(1.0, "Feet", "Length");
             QuantityDTO second = new QuantityDTO(12.0, "Inch", "Length");
             service.Add(first, second, "Feet");
 
             // Count after
-            int finalCount = repository.GetAllMeasurements().Count();
+            int finalCount = repository.GetMeasurementsForUser(null).Count();
             Assert.IsTrue(finalCount > initialCount);
 
-            var latest = repository.GetAllMeasurements().Last();
+            var latest = repository.GetMeasurementsForUser(null).Last();
             Assert.AreEqual("Addition", latest.OperationType);
             Assert.IsFalse(latest.HasError);
             Assert.IsTrue(latest.FinalResult.Contains("2 Feet"));

@@ -32,9 +32,9 @@ namespace QuantityMeasurementApp.Repository
             }
 
             if (string.Equals(secondOperand, "N/A", StringComparison.Ordinal))
-                return new QuantityMeasurementEntity(firstOperand, operationType, finalResult, measurementType);
+                return new QuantityMeasurementEntity(operand: firstOperand, operationType: operationType, result: finalResult, measurementType: measurementType);
 
-            return new QuantityMeasurementEntity(firstOperand, secondOperand, operationType, finalResult, measurementType);
+            return new QuantityMeasurementEntity(firstOperand: firstOperand, secondOperand: secondOperand, operationType: operationType, result: finalResult, measurementType: measurementType);
         }
     }
 }

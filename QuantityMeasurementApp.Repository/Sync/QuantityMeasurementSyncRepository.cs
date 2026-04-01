@@ -40,18 +40,21 @@ namespace QuantityMeasurementApp.Repository.Sync
             }
         }
 
-        public List<QuantityMeasurementEntity> GetAllMeasurements()
+        public List<QuantityMeasurementEntity> GetMeasurementsForUser(int? userId)
         {
             try
             {
-                return _database.GetAllMeasurements();
+                return _database.GetMeasurementsForUser(userId);
             }
             catch (Exception)
             {
                 // Fallback to reading from history and pending if DB is down
-                var all = _historyStore.LoadAll().ToList();
-                all.AddRange(_pendingStore.LoadAll());
-                return all;
+                var query = _historyStore.LoadAll().AsEnumerable().Concat(_pendingStore.LoadAll());
+                if (userId.HasValue)
+                {
+                    query = query.Where(m => m.UserId == userId.Value);
+                }
+                return query.ToList();
             }
         }
 

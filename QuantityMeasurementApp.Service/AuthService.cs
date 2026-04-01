@@ -11,6 +11,7 @@ using QuantityMeasurementApp.Entity.Entities;
 using QuantityMeasurementApp.Repository.Database;
 using QuantityMeasurementApp.Service.Interface;
 using QuantityMeasurementApp.Service.Security;
+using Google.Apis.Auth;
 
 namespace QuantityMeasurementApp.Service
 {
@@ -70,6 +71,34 @@ namespace QuantityMeasurementApp.Service
                 Token = token,
                 Username = user.Username,
                 Message = "Login successful"
+            };
+        }
+
+        public async Task<AuthResponseDTO> GoogleLoginAsync(GoogleLoginDTO dto)
+        {
+            var settings = new GoogleJsonWebSignature.ValidationSettings();
+            var payload = await GoogleJsonWebSignature.ValidateAsync(dto.IdToken, settings);
+            
+            var user = await _context.Set<UserEntity>().FirstOrDefaultAsync(u => u.Email == payload.Email);
+
+            if (user == null)
+            {
+                user = new UserEntity
+                {
+                    Username = payload.Email.Split('@')[0],
+                    Email = payload.Email,
+                    PasswordHash = HashingHelper.HashPassword(Guid.NewGuid().ToString())
+                };
+                _context.Set<UserEntity>().Add(user);
+                await _context.SaveChangesAsync();
+            }
+
+            var token = GenerateJwtToken(user);
+            return new AuthResponseDTO
+            {
+                Token = token,
+                Username = user.Username,
+                Message = "Google Login successful"
             };
         }
 

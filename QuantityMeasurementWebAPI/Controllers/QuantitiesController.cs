@@ -7,6 +7,7 @@ using QuantityMeasurementApp.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
+using System.Security.Claims;
 
 namespace QuantityMeasurementWebAPI.Controllers
 {
@@ -25,6 +26,19 @@ namespace QuantityMeasurementWebAPI.Controllers
             _service = service;
             _repository = repository;
             _cache = cache;
+        }
+
+        private int? GetCurrentUserId()
+        {
+            if (User?.Identity?.IsAuthenticated == true)
+            {
+                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (idClaim != null && int.TryParse(idClaim.Value, out int id))
+                {
+                    return id;
+                }
+            }
+            return null;
         }
 
         private void SafeRemoveCache(string key)
@@ -53,12 +67,14 @@ namespace QuantityMeasurementWebAPI.Controllers
         }
 
         [HttpPost("convert")]
+        [AllowAnonymous]
         public IActionResult Convert([FromBody] ConvertRequest request)
         {
             try
             {
-                var result = _service.Convert(request.Source, request.TargetUnit);
-                SafeRemoveCache(HistoryCacheKey);
+                var userId = GetCurrentUserId();
+                var result = _service.Convert(request.Source, request.TargetUnit, userId);
+                if (userId.HasValue) SafeRemoveCache($"{HistoryCacheKey}_{userId.Value}");
                 return Ok(result);
             }
             catch (QuantityMeasurementException ex)
@@ -72,13 +88,15 @@ namespace QuantityMeasurementWebAPI.Controllers
         }
 
         [HttpPost("compare")]
+        [AllowAnonymous]
         public IActionResult Compare([FromBody] CompareRequest request)
         {
             try
             {
-                var result = _service.Compare(request.Quantity1, request.Quantity2);
+                var userId = GetCurrentUserId();
+                var result = _service.Compare(request.Quantity1, request.Quantity2, userId);
                 bool areEqual = result.Value == 1.0;
-                SafeRemoveCache(HistoryCacheKey);
+                if (userId.HasValue) SafeRemoveCache($"{HistoryCacheKey}_{userId.Value}");
                 return Ok(new { AreEqual = areEqual });
             }
             catch (QuantityMeasurementException ex)
@@ -92,12 +110,14 @@ namespace QuantityMeasurementWebAPI.Controllers
         }
 
         [HttpPost("add")]
+        [AllowAnonymous]
         public IActionResult Add([FromBody] ArithmeticRequest request)
         {
             try
             {
-                var result = _service.Add(request.Quantity1, request.Quantity2, request.TargetUnit);
-                SafeRemoveCache(HistoryCacheKey);
+                var userId = GetCurrentUserId();
+                var result = _service.Add(request.Quantity1, request.Quantity2, request.TargetUnit, userId);
+                if (userId.HasValue) SafeRemoveCache($"{HistoryCacheKey}_{userId.Value}");
                 return Ok(result);
             }
             catch (QuantityMeasurementException ex)
@@ -111,12 +131,14 @@ namespace QuantityMeasurementWebAPI.Controllers
         }
 
         [HttpPost("subtract")]
+        [AllowAnonymous]
         public IActionResult Subtract([FromBody] ArithmeticRequest request)
         {
             try
             {
-                var result = _service.Subtract(request.Quantity1, request.Quantity2, request.TargetUnit);
-                SafeRemoveCache(HistoryCacheKey);
+                var userId = GetCurrentUserId();
+                var result = _service.Subtract(request.Quantity1, request.Quantity2, request.TargetUnit, userId);
+                if (userId.HasValue) SafeRemoveCache($"{HistoryCacheKey}_{userId.Value}");
                 return Ok(result);
             }
             catch (QuantityMeasurementException ex)
@@ -130,12 +152,14 @@ namespace QuantityMeasurementWebAPI.Controllers
         }
 
         [HttpPost("multiply")]
+        [AllowAnonymous]
         public IActionResult Multiply([FromBody] ArithmeticRequest request)
         {
             try
             {
-                var result = _service.Multiply(request.Quantity1, request.Quantity2, request.TargetUnit);
-                SafeRemoveCache(HistoryCacheKey);
+                var userId = GetCurrentUserId();
+                var result = _service.Multiply(request.Quantity1, request.Quantity2, request.TargetUnit, userId);
+                if (userId.HasValue) SafeRemoveCache($"{HistoryCacheKey}_{userId.Value}");
                 return Ok(result);
             }
             catch (QuantityMeasurementException ex)
@@ -149,13 +173,15 @@ namespace QuantityMeasurementWebAPI.Controllers
         }
 
         [HttpPost("divide")]
+        [AllowAnonymous]
         public IActionResult Divide([FromBody] ArithmeticRequest request)
         {
             try
             {
+                var userId = GetCurrentUserId();
                 // The backend Divide interface typically takes two args, returning Ratio
-                var result = _service.Divide(request.Quantity1, request.Quantity2);
-                SafeRemoveCache(HistoryCacheKey);
+                var result = _service.Divide(request.Quantity1, request.Quantity2, userId);
+                if (userId.HasValue) SafeRemoveCache($"{HistoryCacheKey}_{userId.Value}");
                 return Ok(result);
             }
             catch (QuantityMeasurementException ex)
@@ -173,9 +199,14 @@ namespace QuantityMeasurementWebAPI.Controllers
         {
             try
             {
+                var userId = GetCurrentUserId();
+                if (!userId.HasValue) return Unauthorized("User is not logged in.");
+                
+                string userCacheKey = $"{HistoryCacheKey}_{userId.Value}";
+
                 try
                 {
-                    var cachedHistory = _cache.GetString(HistoryCacheKey);
+                    var cachedHistory = _cache.GetString(userCacheKey);
                     if (!string.IsNullOrEmpty(cachedHistory))
                     {
                         var cachedResults = JsonSerializer.Deserialize<List<QuantityMeasurementEntity>>(cachedHistory);
@@ -184,7 +215,7 @@ namespace QuantityMeasurementWebAPI.Controllers
                 }
                 catch (Exception ex) { Console.WriteLine($"Cache read failure: {ex.Message}"); }
 
-                var results = _repository.GetAllMeasurements();
+                var results = _repository.GetMeasurementsForUser(userId.Value);
 
                 try
                 {
@@ -192,7 +223,7 @@ namespace QuantityMeasurementWebAPI.Controllers
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
                     };
-                    _cache.SetString(HistoryCacheKey, JsonSerializer.Serialize(results), cacheOptions);
+                    _cache.SetString(userCacheKey, JsonSerializer.Serialize(results), cacheOptions);
                 }
                 catch (Exception ex) { Console.WriteLine($"Cache write failure: {ex.Message}"); }
 

@@ -71,7 +71,7 @@ namespace QuantityMeasurementApp.Service
 
         // --- Interface Implementations ---
 
-        public QuantityDTO Compare(QuantityDTO q1, QuantityDTO q2)
+        public QuantityDTO Compare(QuantityDTO q1, QuantityDTO q2, int? userId = null)
         {
             try
             {
@@ -93,7 +93,8 @@ namespace QuantityMeasurementApp.Service
                     q2.ToString(),
                     "Equality",
                     resultString,
-                    measurementType);
+                    measurementType,
+                    userId);
                 repository.SaveMeasurement(entity);
 
                 // Return DTO containing boolean as string in the Value/Unit hack, 
@@ -102,13 +103,13 @@ namespace QuantityMeasurementApp.Service
             }
             catch (Exception ex)
             {
-                var entity = new QuantityMeasurementEntity(q1.ToString(), q2.ToString(), "Equality", ex.Message, true);
+                var entity = new QuantityMeasurementEntity(q1.ToString(), q2.ToString(), "Equality", ex.Message, true, q1.MeasurementType, userId);
                 repository.SaveMeasurement(entity);
                 throw new QuantityMeasurementException(ex.Message, ex);
             }
         }
 
-        public QuantityDTO Convert(QuantityDTO source, string targetUnitName)
+        public QuantityDTO Convert(QuantityDTO source, string targetUnitName, int? userId = null)
         {
             try
             {
@@ -127,35 +128,36 @@ namespace QuantityMeasurementApp.Service
                     source.ToString(),
                     "Conversion",
                     resultDto.ToString(),
-                    targetUnit.GetMeasurementType());
+                    targetUnit.GetMeasurementType(),
+                    userId);
                 repository.SaveMeasurement(entity);
 
                 return resultDto;
             }
             catch (Exception ex)
             {
-                var entity = new QuantityMeasurementEntity(source.ToString(), targetUnitName, "Conversion", ex.Message, true);
+                var entity = new QuantityMeasurementEntity(source.ToString(), targetUnitName, "Conversion", ex.Message, true, "N/A", userId);
                 repository.SaveMeasurement(entity);
                 throw new QuantityMeasurementException(ex.Message, ex);
             }
         }
 
-        public QuantityDTO Add(QuantityDTO q1, QuantityDTO q2, string targetUnitName)
+        public QuantityDTO Add(QuantityDTO q1, QuantityDTO q2, string targetUnitName, int? userId = null)
         {
-            return PerformArithmetic(q1, q2, targetUnitName, "Addition");
+            return PerformArithmetic(q1, q2, targetUnitName, "Addition", userId);
         }
 
-        public QuantityDTO Subtract(QuantityDTO q1, QuantityDTO q2, string targetUnitName)
+        public QuantityDTO Subtract(QuantityDTO q1, QuantityDTO q2, string targetUnitName, int? userId = null)
         {
-            return PerformArithmetic(q1, q2, targetUnitName, "Subtraction");
+            return PerformArithmetic(q1, q2, targetUnitName, "Subtraction", userId);
         }
 
-        public QuantityDTO Multiply(QuantityDTO q1, QuantityDTO q2, string targetUnitName)
+        public QuantityDTO Multiply(QuantityDTO q1, QuantityDTO q2, string targetUnitName, int? userId = null)
         {
-            return PerformArithmetic(q1, q2, targetUnitName, "Multiplication");
+            return PerformArithmetic(q1, q2, targetUnitName, "Multiplication", userId);
         }
 
-        public QuantityDTO Divide(QuantityDTO q1, QuantityDTO q2)
+        public QuantityDTO Divide(QuantityDTO q1, QuantityDTO q2, int? userId = null)
         {
             try
             {
@@ -181,20 +183,21 @@ namespace QuantityMeasurementApp.Service
                     q2.ToString(),
                     "Division",
                     resultDto.ToString(),
-                    q1.MeasurementType);
+                    q1.MeasurementType,
+                    userId);
                 repository.SaveMeasurement(entity);
 
                 return resultDto;
             }
             catch (Exception ex)
             {
-                var entity = new QuantityMeasurementEntity(q1.ToString(), q2.ToString(), "Division", ex.Message, true);
+                var entity = new QuantityMeasurementEntity(q1.ToString(), q2.ToString(), "Division", ex.Message, true, q1.MeasurementType, userId);
                 repository.SaveMeasurement(entity);
                 throw new QuantityMeasurementException(ex.Message, ex);
             }
         }
 
-        private QuantityDTO PerformArithmetic(QuantityDTO q1, QuantityDTO q2, string targetUnitName, string operationName)
+        private QuantityDTO PerformArithmetic(QuantityDTO q1, QuantityDTO q2, string targetUnitName, string operationName, int? userId = null)
         {
             try
             {
@@ -238,7 +241,8 @@ namespace QuantityMeasurementApp.Service
                     q2.ToString(),
                     operationName,
                     resultDto.ToString(),
-                    q1.MeasurementType);
+                    q1.MeasurementType,
+                    userId);
                 repository.SaveMeasurement(entity);
 
                 return resultDto;
@@ -249,7 +253,7 @@ namespace QuantityMeasurementApp.Service
                 {
                     ex = new QuantityMeasurementException("Temperature does not support arithmetic operations.", ex);
                 }
-                var entity = new QuantityMeasurementEntity(q1.ToString(), q2.ToString(), operationName, ex.Message, true);
+                var entity = new QuantityMeasurementEntity(q1.ToString(), q2.ToString(), operationName, ex.Message, true, q1.MeasurementType, userId);
                 repository.SaveMeasurement(entity);
                 throw new QuantityMeasurementException(ex.Message, ex);
             }

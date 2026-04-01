@@ -30,11 +30,16 @@ namespace QuantityMeasurementApp.Repository
             }
         }
 
-        public List<QuantityMeasurementEntity> GetAllMeasurements()
+        public List<QuantityMeasurementEntity> GetMeasurementsForUser(int? userId)
         {
             try
             {
-                return _context.Measurements.ToList();
+                var query = _context.Measurements.AsQueryable();
+                if (userId.HasValue)
+                {
+                    query = query.Where(m => m.UserId == userId.Value);
+                }
+                return query.ToList();
             }
             catch (Exception ex)
             {
