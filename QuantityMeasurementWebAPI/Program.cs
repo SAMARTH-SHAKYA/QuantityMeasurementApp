@@ -23,6 +23,15 @@ JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Fix: Disable ReloadOnChange to prevent inotify exhaustion on Linux/Docker.
+// ASP.NET Core watches config files by default (for hot-reload), consuming one
+// inotify instance per file. The default OS limit of 1024 is quickly hit in
+// containers. Production doesn't need hot-reload, so we disable it.
+builder.Configuration.Sources
+    .OfType<Microsoft.Extensions.Configuration.Json.JsonConfigurationSource>()
+    .ToList()
+    .ForEach(s => s.ReloadOnChange = false);
+
 // Add services to the container.
 builder.Services.AddControllers();
 
